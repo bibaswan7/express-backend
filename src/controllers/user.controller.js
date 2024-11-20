@@ -7,12 +7,6 @@ import jwt from "jsonwebtoken";
 
 const registerUser = asyncHandler(async (req, res) => {
   const { fullName, username, email, password } = req.body;
-  // console.log(fullName, username, email, password)
-  if (
-    [fullName, email, username, password].some((field) => field?.trim() === "")
-  ) {
-    throw new ApiError(400, "All fields are required");
-  }
 
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
@@ -70,10 +64,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   const { email, username, password } = req.body;
-  console.log("Credentials", email, username, password);
-  if (!(username || email)) {
-    throw new ApiError(400, "username or email is required");
-  }
 
   const user = await User.findOne({
     $or: [{ username }, { email }],
@@ -213,9 +203,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const user = await User.findById(req.user?._id);
-  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+  const comparePassword = await user.comparePassword(oldPassword);
 
-  if (!isPasswordCorrect) {
+  if (!comparePassword) {
     throw new ApiError(400, "Invalid old password");
   }
 
