@@ -3,6 +3,7 @@ import { registerUser, loginUser, logoutUser, refreshAccessToken, getCurrentUser
 import {upload} from "../middlewares/multer.middleware.js"
 import { protect,roles } from "../middlewares/auth.middleware.js";
 import validateModal from "../utils/feildValidator.js";
+import { User } from "../models/user.model.js";
 const router = Router()
 
 router.route("/register").post(
@@ -16,11 +17,11 @@ router.route("/register").post(
             maxCount: 1
         }
     ]),
-    validateModal,
+    validateModal(User.schema),
     registerUser
     );
     
-router.route("/login").post(validateModal,loginUser);
+router.route("/login").post(validateModal(User.schema),loginUser);
 
 
 // secured routes
